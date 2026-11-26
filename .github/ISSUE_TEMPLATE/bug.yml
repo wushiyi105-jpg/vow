@@ -1,0 +1,25 @@
+name: 问题反馈
+description: 跑不通、算错了、页面报错
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 具体命令、页面、期望与实际
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      description: 系统、Python 版本、是否配了模型 key
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: 报错原文
+      description: 完整栈，别删行
+    validations:
+      required: false

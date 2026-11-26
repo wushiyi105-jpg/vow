@@ -1,0 +1,18 @@
+name: 需求建议
+description: 新的规则、新的入口、新的口径
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: scene
+    attributes:
+      label: 场景
+      description: 谁在什么情况下用，现在怎么绕过
+    validations:
+      required: true
+  - type: textarea
+    id: rule
+    attributes:
+      label: 期望的规则
+      description: 最好能落到一条 rule_id，以及扣分或提示
+    validations:
+      required: true

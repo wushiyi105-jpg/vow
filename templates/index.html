@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Vow · 备婚</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--line:#26303d;--ink:#e6edf3;--dim:#8b949e;--accent:#4f9cf9}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"PingFang SC",sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .num{font-size:20px;font-weight:600}
+  .lbl{color:var(--dim);font-size:12px}
+  .bar{height:8px;background:#21262d;border-radius:6px;overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:8px;background:var(--accent)}
+  .finding{color:#f0883e;font-size:13px}
+  a{color:var(--accent);text-decoration:none;margin-right:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Vow</h1>
+  <div class="sub">婚期 {{ p.wedding_on }} · 剩 {{ p.days_left }} 天 · 扣分 {{ p.penalty_total }}</div>
+
+  <div class="cards">
+    <div class="card"><div class="num">{{ '%.0f' % p.actual }}</div><div class="lbl">已花 / 预算 {{ '%.0f' % p.planned }}</div><div class="bar"><i style="width:{{ (p.ratio * 100) if p.ratio < 1 else 100 }}%"></i></div></div>
+    <div class="card"><div class="num">{{ p.guests }}</div><div class="lbl">宾客</div></div>
+    <div class="card"><div class="num">{{ p.tables }}</div><div class="lbl">桌数</div></div>
+    <div class="card"><div class="num">{{ '%.0f' % p.per_person }}</div><div class="lbl">人均</div></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">筹备倒排</div>
+    {% for t in tasks %}
+    <div>{{ t.due_on }} {{ t.name }}{% if t.done %} ✓{% endif %}</div>
+    {% endfor %}
+  </div>
+
+  {% for f in p.findings %}
+  <div class="finding">{{ f.rule_id }} -{{ f.penalty }} · {{ f.message }}</div>
+  {% endfor %}
+
+  <p><a href="/status.txt">文字总览</a><a href="/health">健康检查</a></p>
+</div>
+</body>
+</html>

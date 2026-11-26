@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vow"
+version = "1.0.0"
+description = "备婚：预算、供应商、倒排，全对着婚礼那天"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "shiyi", email = "wushiyi105@gmail.com" }]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "httpx>=0.27",
+  "jinja2>=3.1",
+  "typer>=0.12",
+  "rich>=13.7",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "respx>=0.21",
+  "freezegun>=1.5",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "pip-audit>=2.7",
+]
+
+[project.scripts]
+vow = "vow.iface.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["vow"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["vow"]
+branch = true
+omit = ["vow/iface/cli.py", "vow/doctor.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
