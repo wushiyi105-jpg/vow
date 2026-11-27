@@ -51,6 +51,9 @@ You enter structured amounts; hidden fees are extracted with a mandatory source 
 **Is the deposit counted as spent?**
 No, deposits are tracked separately.
 
+**Was the Docker image verified?**
+Docker is not installed on the build machine, so `docker build .` was not run and the image is unverified; only the Dockerfile and ports were checked statically.
+
 ## Commands
 
 See the Chinese README (`README.md`) for the command table with flags; every command supports `--help`.
@@ -63,14 +66,14 @@ FastAPI + Uvicorn, Jinja2, pydantic / pydantic-settings, httpx, Typer + Rich, SQ
 
 ```mermaid
 graph LR
-  A[预算项] --> M[超支比对]
-  B[宾客] --> M[桌数换算]
-  C[筹备任务] --> M[倒排]
-  D[供应商报价] --> M[隐藏费抽取]
-  M --> R[规则：超支 / 桌数 / 逾期]
-  R --> P[模型写说明]
-  P --> G[原文守卫]
-  G --> O[总览 + 待办]
+  A[budget items] --> M[overspend compare]
+  B[guests] --> M[table conversion]
+  C[prep tasks] --> M[back-schedule]
+  D[vendor quotes] --> M[hidden fee extraction]
+  M --> R[rules: overspend / tables / overdue]
+  R --> P[model writes note]
+  P --> G[source guard]
+  G --> O[overview + to-dos]
 ```
 
 ## Layout
