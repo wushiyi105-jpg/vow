@@ -4,35 +4,37 @@ from __future__ import annotations
 
 import json
 from datetime import date
+from pathlib import Path
 
-from ..adapters.llm import build_llm
-from ..adapters.store import SqliteStore
 from ..config import Settings
 from ..domain.engine import build
 from ..domain.guard import check as hidden_check
 from ..domain.models import Finding, Plan, Vendor
+from ..ports import LLMPort, StorePort
 
-PROMPT = """你在帮新人看婚礼报价，输出 JSON：
-{"hidden_fees": [{"text": "费用名", "quote": "报价原文片段", "why": "凭什么收"}],
- "questions": ["要问供应商的问题"]}
-quote 必须是报价原文里的连续片段，找不到就别写这一条。"""
+PROMPT = (Path(__file__).resolve().parents[2] / "prompts" / "vendor.md").read_text(encoding="utf-8")
 
 
-def plan(store: SqliteStore, settings: Settings, today: date | None = None) -> Plan:
+def plan(store: StorePort, settings: Settings, today: date | None = None) -> Plan:
     return build(
         store.list_budget(), store.list_guests(), store.list_tasks(),
         settings.wedding_on, today or date.today(),
     )
 
 
-def review_vendor(store: SqliteStore, settings: Settings, vendor_id: int, today: date | None = None) -> tuple[Plan, list[str], list[Finding]]:
+def review_vendor(
+    store: StorePort,
+    settings: Settings,
+    vendor_id: int,
+    today: date | None = None,
+    llm: LLMPort | None = None,
+) -> tuple[Plan, list[str], list[Finding]]:
     p = plan(store, settings, today)
     vendor = next((v for v in store.list_vendors() if v.id == vendor_id), None)
     if vendor is None:
         raise ValueError(f"没有这个供应商：{vendor_id}")
-    if not settings.llm_enabled:
+    if llm is None:
         return p, [], []
-    llm = build_llm(settings.llm_base_url, settings.llm_api_key, settings.llm_model, PROMPT)
     try:
         data = json.loads(llm.write(PROMPT, f"vendor={vendor.name}\nquote={vendor.quote}"))
     except Exception:  # noqa: BLE001

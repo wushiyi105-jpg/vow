@@ -10,9 +10,11 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from ..adapters.llm import build_llm
+from ..adapters.notify import WebhookNotifier
 from ..adapters.store import SqliteStore
 from ..app.jobs import enqueue_daily, run_due
-from ..app.run import plan, review_vendor
+from ..app.run import PROMPT, plan, review_vendor
 from ..config import Settings
 from ..config import settings as default_settings
 from ..doctor import main as doctor_main
@@ -78,7 +80,8 @@ def vendor(vendor_id: int = typer.Option(...), db: Path = typer.Option(None)) ->
     """看某家供应商的隐藏项。"""
     s = _settings(db)
     try:
-        p, questions, findings = review_vendor(_store(s), s, vendor_id)
+        llm = build_llm(s.llm_base_url, s.llm_api_key, s.llm_model, PROMPT) if s.llm_enabled else None
+        p, questions, findings = review_vendor(_store(s), s, vendor_id, llm=llm)
     except ValueError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(code=2) from exc
@@ -97,7 +100,7 @@ def jobs(
     d = date.fromisoformat(day) if day else date.today()
     store = _store(s)
     if run:
-        console.print(f"发出 {run_due(store, s, d)} 条")
+        console.print(f"发出 {run_due(store, s, d, WebhookNotifier(s.webhook_url))} 条")
         return
     console.print("已入队" if enqueue_daily(store, d) else "今天已排过")
 

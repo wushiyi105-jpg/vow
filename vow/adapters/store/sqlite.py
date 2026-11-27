@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import Boolean, Date, Float, Integer, String, Text, inspect, select
 from sqlalchemy.orm import Mapped, Session, mapped_column, sessionmaker
 
@@ -63,6 +65,14 @@ class JobRow(Base):
     error: Mapped[str] = mapped_column(Text, default="")
 
 
+def _upgrade_schema(engine) -> None:
+    root = next(p for p in Path(__file__).resolve().parents if (p / "alembic.ini").exists())
+    cfg = Config(str(root / "alembic.ini"))
+    cfg.set_main_option("script_location", str(root / "migrations"))
+    cfg.set_main_option("sqlalchemy.url", f"sqlite:///{engine.url.database}")
+    command.upgrade(cfg, "head")
+
+
 class SqliteStore:
     def __init__(self, path: Path | str) -> None:
         self.path = Path(path)
@@ -71,7 +81,7 @@ class SqliteStore:
         self.init_schema()
 
     def init_schema(self) -> None:
-        Base.metadata.create_all(self.engine)
+        _upgrade_schema(self.engine)
 
     def schema_ok(self) -> bool:
         return {"budget", "vendors", "tasks", "guests", "jobs"} <= set(

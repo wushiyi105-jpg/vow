@@ -4,18 +4,16 @@ from __future__ import annotations
 
 from datetime import date
 
-from ..adapters.notify import WebhookNotifier
-from ..adapters.store import SqliteStore
 from ..config import Settings
+from ..ports import NotifierPort, StorePort
 from .run import plan
 
 
-def enqueue_daily(store: SqliteStore, today: date) -> bool:
+def enqueue_daily(store: StorePort, today: date) -> bool:
     return store.enqueue(f"vow:{today}", "overdue_scan", today.isoformat(), today)
 
 
-def run_due(store: SqliteStore, settings: Settings, today: date) -> int:
-    notifier = WebhookNotifier(settings.webhook_url)
+def run_due(store: StorePort, settings: Settings, today: date, notifier: NotifierPort) -> int:
     sent = 0
     for job in store.due_jobs(today):
         p = plan(store, settings, today)
