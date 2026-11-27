@@ -1,0 +1,32 @@
+{
+  "items": [
+    {"name": "确定婚期与总预算", "category": "决策", "lead_days": 365},
+    {"name": "确定婚礼形式与风格", "category": "决策", "lead_days": 300},
+    {"name": "预订宴会厅", "category": "场地", "lead_days": 240},
+    {"name": "确定宾客名单", "category": "宾客", "lead_days": 180},
+    {"name": "拍婚纱照", "category": "影像", "lead_days": 210},
+    {"name": "选婚纱礼服", "category": "礼服", "lead_days": 120},
+    {"name": "定婚庆策划", "category": "婚庆", "lead_days": 180},
+    {"name": "定司仪", "category": "四大金刚", "lead_days": 150},
+    {"name": "定摄影摄像", "category": "四大金刚", "lead_days": 150},
+    {"name": "定化妆师", "category": "四大金刚", "lead_days": 120},
+    {"name": "定蜜月行程", "category": "蜜月", "lead_days": 90},
+    {"name": "买三金与对戒", "category": "首饰", "lead_days": 120},
+    {"name": "定喜糖与请柬", "category": "回礼", "lead_days": 90},
+    {"name": "定婚车与路线", "category": "婚车", "lead_days": 60},
+    {"name": "试妆与定妆", "category": "四大金刚", "lead_days": 45},
+    {"name": "确认菜单与酒水", "category": "宴席", "lead_days": 45},
+    {"name": "排座位表", "category": "宾客", "lead_days": 30},
+    {"name": "发请柬", "category": "宾客", "lead_days": 45},
+    {"name": "确认桌数", "category": "宴席", "lead_days": 14},
+    {"name": "婚礼流程彩排", "category": "流程", "lead_days": 7},
+    {"name": "定住宿与接送", "category": "接待", "lead_days": 30},
+    {"name": "伴郎伴娘分工", "category": "流程", "lead_days": 21},
+    {"name": "婚礼音乐与视频", "category": "流程", "lead_days": 21},
+    {"name": "采买婚房布置", "category": "布置", "lead_days": 30},
+    {"name": "确认证婚人与主婚人", "category": "流程", "lead_days": 30},
+    {"name": "准备红包与礼金", "category": "接待", "lead_days": 7},
+    {"name": "婚庆进场搭建", "category": "婚庆", "lead_days": 1},
+    {"name": "结算尾款与回礼", "category": "收尾", "lead_days": -7}
+  ]
+}

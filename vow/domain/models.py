@@ -60,6 +60,9 @@ class Plan:
     per_person: float = 0.0
     overdue: list[str] = field(default_factory=list)
     findings: list[Finding] = field(default_factory=list)
+    hidden: list[dict[str, str]] = field(default_factory=list)
+    questions: list[str] = field(default_factory=list)
+    source: str = "offline"
 
     @property
     def ratio(self) -> float:

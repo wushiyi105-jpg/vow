@@ -7,6 +7,7 @@ from datetime import date
 from pathlib import Path
 
 from ..config import Settings
+from ..domain.catalog import merge_hidden
 from ..domain.engine import build
 from ..domain.guard import check as hidden_check
 from ..domain.models import Finding, Plan, Vendor
@@ -22,6 +23,26 @@ def plan(store: StorePort, settings: Settings, today: date | None = None) -> Pla
     )
 
 
+def review_quote(
+    vendor: Vendor, llm: LLMPort | None = None
+) -> tuple[list[dict[str, str]], list[str], list[Finding], str]:
+    """模型只填“疑点 + 原文 + 问题”，本地再补齐漏项。"""
+    model_fees: list[dict] = []
+    questions: list[str] = []
+    findings: list[Finding] = []
+    source = "offline"
+    if llm is not None:
+        try:
+            data = json.loads(llm.write(PROMPT, f"vendor={vendor.name}\nquote={vendor.quote}"))
+            raw_fees = list(data.get("hidden_fees", []))
+            model_fees, findings = hidden_check(raw_fees, vendor.quote)
+            questions = [str(q) for q in data.get("questions", []) if str(q).strip()]
+            source = "model"
+        except Exception:  # noqa: BLE001
+            source = "offline"
+    return merge_hidden(vendor.quote, model_fees), questions, findings, source
+
+
 def review_vendor(
     store: StorePort,
     settings: Settings,
@@ -33,14 +54,12 @@ def review_vendor(
     vendor = next((v for v in store.list_vendors() if v.id == vendor_id), None)
     if vendor is None:
         raise ValueError(f"没有这个供应商：{vendor_id}")
-    if llm is None:
-        return p, [], []
-    try:
-        data = json.loads(llm.write(PROMPT, f"vendor={vendor.name}\nquote={vendor.quote}"))
-    except Exception:  # noqa: BLE001
-        return p, [], []
-    fees, findings = hidden_check(data.get("hidden_fees", []), vendor.quote)
-    return p, [str(q) for q in data.get("questions", [])], findings
+    fees, questions, findings, source = review_quote(vendor, llm)
+    p.hidden = fees
+    p.questions = questions
+    p.findings.extend(findings)
+    p.source = source
+    return p, questions, findings
 
 
 def facts(p: Plan, vendors: list[Vendor]) -> str:

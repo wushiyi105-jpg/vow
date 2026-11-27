@@ -6,7 +6,11 @@
     {"category": "婚庆布置", "planned": 25000, "actual": 31000, "deposit": 8000},
     {"category": "三金与礼服", "planned": 20000, "actual": 18000, "deposit": 0},
     {"category": "酒水喜糖", "planned": 12000, "actual": 9800, "deposit": 3000},
-    {"category": "蜜月预留", "planned": 15000, "actual": 0, "deposit": 0}
+    {"category": "蜜月预留", "planned": 15000, "actual": 0, "deposit": 0},
+    {"category": "婚车与路线", "planned": 8000, "actual": 8600, "deposit": 1000},
+    {"category": "请柬与回礼", "planned": 6000, "actual": 5200, "deposit": 0},
+    {"category": "住宿与接送", "planned": 5000, "actual": 0, "deposit": 0},
+    {"category": "机动备用金", "planned": 10000, "actual": 0, "deposit": 0}
   ],
   "guests": [
     {"name": "女方亲戚", "side": "bride", "count": 34},
@@ -14,19 +18,12 @@
     {"name": "同事朋友", "side": "both", "count": 22},
     {"name": "大学同学", "side": "bride", "count": 9}
   ],
-  "tasks": [
-    {"name": "定酒店与档期", "due": "2026-06-30", "done": true},
-    {"name": "拍婚纱照", "due": "2026-09-30", "done": true},
-    {"name": "定婚庆公司", "due": "2026-10-31", "done": true},
-    {"name": "发请柬", "due": "2027-02-15", "done": false},
-    {"name": "试妆与定妆", "due": "2027-03-20", "done": false},
-    {"name": "确认桌数与菜单", "due": "2027-04-05", "done": false},
-    {"name": "排座位表", "due": "2027-04-20", "done": false},
-    {"name": "婚车与路线", "due": "2026-11-25", "done": false}
-  ],
   "vendors": [
     {"name": "青禾宴会厅", "amount": 86000, "quote": "宴席 86000 元，含 28 桌；超 28 桌每桌 3200 元；进场费 2000 元；服务费 10%。"},
-    {"name": "远山影像", "amount": 29800, "quote": "婚纱照 29800 元，含 4 套服装；外景车费 800 元；加急出片 1500 元。"},
-    {"name": "北岸花艺", "amount": 31000, "quote": "布置 31000 元，含主舞台；灯光加租 3000 元；撤场清运 1200 元。"}
+    {"name": "云庭酒店", "amount": 79000, "quote": "宴席 79000 元，含 26 桌；不含酒水；服务费 12%；超时费 1500 元/小时；进场费 3000 元；备桌每桌 2800 元。"},
+    {"name": "远山影像", "amount": 29800, "quote": "婚纱照 29800 元，含 4 套服装；外景车费 800 元；加急出片 1500 元；精修加片 120 元/张。"},
+    {"name": "拾光摄影", "amount": 26800, "quote": "婚纱照 26800 元，含 3 套服装；底片买断 2000 元；服装升级 1800 元；外景车费 600 元；加急出片 1200 元。"},
+    {"name": "北岸花艺", "amount": 31000, "quote": "布置 31000 元，含主舞台；灯光加租 3000 元；撤场清运 1200 元；异地布展 1500 元。"},
+    {"name": "花间集", "amount": 28500, "quote": "布置 28500 元，含主舞台与签到区；音响加租 1800 元；灯光加租 2600 元；撤场清运 1000 元。"}
   ]
 }

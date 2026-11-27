@@ -14,10 +14,12 @@ from ..adapters.llm import build_llm
 from ..adapters.notify import WebhookNotifier
 from ..adapters.store import SqliteStore
 from ..app.jobs import enqueue_daily, run_due
+from ..app.report import build_report
 from ..app.run import PROMPT, plan, review_vendor
 from ..config import Settings
 from ..config import settings as default_settings
 from ..doctor import main as doctor_main
+from ..domain.catalog import checklist, due_on
 
 app = typer.Typer(help="备婚：预算、供应商、倒排", no_args_is_help=True)
 console = Console()
@@ -48,11 +50,15 @@ def seed(db: Path = typer.Option(None)) -> None:
         store.add_budget(b["category"], b["planned"], b["actual"], b.get("deposit", 0))
     for g in data["guests"]:
         store.add_guest(g["name"], g["side"], g.get("count", 1))
-    for t in data["tasks"]:
-        store.add_task(t["name"], date.fromisoformat(t["due"]), t.get("done", False))
+    # 28 项清单按婚期倒排；前 7 项视为已办，方便第一次跑就有一条完整时间线。
+    for index, item in enumerate(checklist()):
+        store.add_task(item["name"], due_on(item, s.wedding_on), index < 7)
     for v in data["vendors"]:
         store.add_vendor(v["name"], v["quote"], v["amount"])
-    console.print(f"已写入 {len(data['budget'])} 个预算项、{len(data['guests'])} 位宾客、{len(data['tasks'])} 个任务")
+    console.print(
+        f"已写入 {len(data['budget'])} 个预算项、{len(data['guests'])} 位宾客、"
+        f"{len(checklist())} 个筹备节点、{len(data['vendors'])} 家供应商"
+    )
 
 
 @app.command()
@@ -76,6 +82,30 @@ def status(day: str = typer.Option(""), db: Path = typer.Option(None)) -> None:
 
 
 @app.command()
+def report(
+    day: str = typer.Option("", help="核算日期 YYYY-MM-DD，默认今天"),
+    out: Path = typer.Option(None, help="输出 Markdown 文件；不填打印到终端"),
+    no_llm: bool = typer.Option(False, "--no-llm", help="强制只用本地加价词典"),
+    db: Path = typer.Option(None),
+) -> None:
+    """一页备婚报告：预算、比价、隐藏加价、28 项倒排。"""
+    s = _settings(db)
+    d = date.fromisoformat(day) if day else date.today()
+    llm = None
+    if s.llm_enabled and not no_llm:
+        llm = build_llm(s.llm_base_url, s.llm_api_key, s.llm_model, PROMPT)
+    text, p = build_report(_store(s), s, d, llm)
+    if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text, encoding="utf-8")
+        console.print(f"[green]已写出[/] {out}（{len(text.splitlines())} 行）")
+    else:
+        console.print(text)
+    if p.source == "offline":
+        console.print("[dim]本次为本地核算：模型未参与，报价疑点来自本地词典。[/]")
+
+
+@app.command()
 def vendor(vendor_id: int = typer.Option(...), db: Path = typer.Option(None)) -> None:
     """看某家供应商的隐藏项。"""
     s = _settings(db)
@@ -85,10 +115,14 @@ def vendor(vendor_id: int = typer.Option(...), db: Path = typer.Option(None)) ->
     except ValueError as exc:
         console.print(f"[red]{exc}[/]")
         raise typer.Exit(code=2) from exc
+    for fee in p.hidden:
+        console.print(f"加价：{fee['text']}（{fee['quote']}）")
     for q in questions:
         console.print(f"问：{q}")
     for f in findings:
         console.print(f"  [yellow]{f.rule_id}[/] -{f.penalty} {f.message}")
+    if p.source == "offline":
+        console.print("[dim]本次为本地核算：模型未参与，疑点来自本地加价词典。[/]")
 
 
 @app.command()
