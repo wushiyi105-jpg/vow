@@ -1,48 +1,48 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>Vow · 备婚</title>
-<style>
-  :root{--bg:#0d1117;--panel:#161b22;--line:#26303d;--ink:#e6edf3;--dim:#8b949e;--accent:#4f9cf9}
-  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"PingFang SC",sans-serif}
-  .wrap{max-width:900px;margin:0 auto;padding:40px 20px 80px}
-  h1{font-size:22px;margin:0 0 4px}
-  .sub{color:var(--dim);font-size:13px;margin-bottom:20px}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
-  .num{font-size:20px;font-weight:600}
-  .lbl{color:var(--dim);font-size:12px}
-  .bar{height:8px;background:#21262d;border-radius:6px;overflow:hidden;margin-top:8px}
-  .bar i{display:block;height:8px;background:var(--accent)}
-  .finding{color:#f0883e;font-size:13px}
-  a{color:var(--accent);text-decoration:none;margin-right:14px}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1>Vow</h1>
-  <div class="sub">婚期 {{ p.wedding_on }} · 剩 {{ p.days_left }} 天 · 扣分 {{ p.penalty_total }}</div>
+{% from "_macros.html" import shell, head, stats, card, tag, empty, note %}
+{% call shell("Vow", "备婚", true) %}
+{{ head("备婚进度", "婚期 " ~ p.wedding_on ~ " · 还剩 " ~ p.days_left ~ " 天") }}
 
-  <div class="cards">
-    <div class="card"><div class="num">{{ '%.0f' % p.actual }}</div><div class="lbl">已花 / 预算 {{ '%.0f' % p.planned }}</div><div class="bar"><i style="width:{{ (p.ratio * 100) if p.ratio < 1 else 100 }}%"></i></div></div>
-    <div class="card"><div class="num">{{ p.guests }}</div><div class="lbl">宾客</div></div>
-    <div class="card"><div class="num">{{ p.tables }}</div><div class="lbl">桌数</div></div>
-    <div class="card"><div class="num">{{ '%.0f' % p.per_person }}</div><div class="lbl">人均</div></div>
-  </div>
+{{ stats([
+  ("已花", "%.0f"|format(p.actual), "元"),
+  ("预算", "%.0f"|format(p.planned), "元"),
+  ("宾客", p.guests, "位"),
+  ("桌数", p.tables, "桌")
+]) }}
 
-  <div class="card">
-    <div class="lbl">筹备倒排</div>
+{% call card("预算执行", ("%.0f"|format(p.ratio * 100)) ~ "%") %}
+  <div class="list-row"><span class="t">已花 / 预算</span><span class="mono-num">{{ "%.0f"|format(p.actual) }} / {{ "%.0f"|format(p.planned) }}</span></div>
+  <div class="progress"><i style="width:{{ (p.ratio * 100) if p.ratio < 1 else 100 }}%"></i></div>
+  <div class="list-row"><span class="t">人均</span><span class="mono-num">{{ "%.0f"|format(p.per_person) }} 元</span></div>
+{% endcall %}
+
+{% call card("筹备倒排", tasks|length ~ " 项") %}
+  {% if tasks %}
+  <div class="timeline">
     {% for t in tasks %}
-    <div>{{ t.due_on }} {{ t.name }}{% if t.done %} ✓{% endif %}</div>
+    <div class="timeline-item">
+      <span class="d">{{ t.due_on }}</span>
+      <span>{{ t.name }}</span>
+      {% if t.done %}{{ tag("完成", "ok") }}{% else %}{{ tag("待办", "warn") }}{% endif %}
+    </div>
     {% endfor %}
   </div>
+  {% else %}
+  {{ empty("还没有筹备事项", "先跑 seed 写入清单。") }}
+  {% endif %}
+{% endcall %}
 
+{% if p.findings %}
+{% call card("扣分明细", p.penalty_total ~ " 分") %}
+  <div class="stack">
   {% for f in p.findings %}
-  <div class="finding">{{ f.rule_id }} -{{ f.penalty }} · {{ f.message }}</div>
+    <div class="list-row"><span class="t">{{ f.message }}</span>{{ tag(f.rule_id ~ " · −" ~ f.penalty, "warn") }}</div>
   {% endfor %}
+  </div>
+{% endcall %}
+{% endif %}
 
-  <p><a href="/status.txt">文字总览</a><a href="/health">健康检查</a></p>
+<div class="form-actions">
+  <a class="btn" href="/status.txt">文字总览</a>
+  <a class="btn btn--ghost" href="/health">健康检查</a>
 </div>
-</body>
-</html>
+{% endcall %}

@@ -6,6 +6,7 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY vow ./vow
 COPY templates ./templates
+COPY static ./static
 COPY prompts ./prompts
 COPY migrations ./migrations
 COPY alembic.ini ./
@@ -24,6 +25,7 @@ WORKDIR /app
 
 COPY --from=builder /install /usr/local
 COPY --from=builder /app/templates ./templates
+COPY --from=builder /app/static ./static
 COPY --from=builder /app/prompts ./prompts
 COPY --from=builder /app/vow ./vow
 COPY --from=builder /app/migrations ./migrations
@@ -34,3 +36,4 @@ VOLUME ["/data"]
 EXPOSE 8008
 
 CMD ["uvicorn", "vow.iface.web:app_factory", "--factory", "--host", "0.0.0.0", "--port", "8008"]
+
