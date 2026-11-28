@@ -1,0 +1,28 @@
+:root {
+  --bg: #FBF9F4;
+  --bg-subtle: #F6F2E9;
+  --bg-muted: #ECE5D8;
+  --card: #FFFFFF;
+  --text: #1D211D;
+  --text-2: #4d554d;
+  --text-3: #646a64;
+  --text-4: #6c716a;
+  --border: #E6E0D3;
+  --border-2: #D7D0C1;
+  --border-3: #C4BBA8;
+  --accent: #2F5D4A;
+  --accent-soft: #E7F1EA;
+  --accent-ink: #244A3A;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-lg: 10px;
+}
+:root[data-theme="dark"] {
+  --accent: #7FB89B;
+  --accent-soft: #173126;
+  --accent-ink: #B6DCC8;
+}
+.page-head h1, .card__head h2 { font-family: "Songti SC", "SimSun", serif; }
+.topbar { border-bottom: 1px solid var(--border-3); }
+.page-head { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+

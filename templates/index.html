@@ -1,6 +1,6 @@
 {% from "_macros.html" import shell, head, stats, card, tag, empty, note %}
-{% call shell("Vow", "备婚", true) %}
-{{ head("备婚进度", "婚期 " ~ p.wedding_on ~ " · 还剩 " ~ p.days_left ~ " 天") }}
+{% call shell("Vow", "备婚指挥册", true) %}
+{{ head("婚礼还有多少天，预算够不够", "婚期 " ~ p.wedding_on ~ " · 还剩 " ~ p.days_left ~ " 天") }}
 
 {{ stats([
   ("已花", "%.0f"|format(p.actual), "元"),
